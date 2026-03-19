@@ -36,6 +36,36 @@
             margin: 10px auto;
             font-weight: 700;
         }
+        
+        /* Instructions Styles */
+        .instructions {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #7d1339;
+            padding: 20px 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            margin: 10px auto 20px auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .instructions h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        .instructions ol {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        .instructions li {
+            margin-bottom: 12px;
+        }
+        .instructions strong {
+            color: #ba1c54;
+        }
+
         .container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -118,12 +148,25 @@
             font-weight: bold;
             text-align: center;
         }
-        #timer {
+
+        /* Stats Container (Timer + Score) */
+        .stats-container {
+            display: flex;
+            gap: 20px;
             margin-top: 10px;
+            justify-content: center;
+            align-items: center;
             font-size: 18px;
             color: #7d1339;
             font-weight: bold;
         }
+        .stat-box {
+            background-color: rgba(255, 255, 255, 0.6);
+            padding: 8px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
         .input-container {
             margin: 20px 0;
             display: flex;
@@ -168,6 +211,17 @@
 </head>
 <body>
     <h1>Memory Card Game</h1>
+
+    <div class="instructions">
+        <h2>📝 How to Play</h2>
+        <ol>
+            <li><strong>Prepare your Excel:</strong> Create an Excel file (.xlsx). Put your terms in <b>Column A</b> and their matches in <b>Column B</b>.</li>
+            <li><strong>Upload & Generate:</strong> Click <b>"Upload Excel File"</b>, select your file, then click <b>"Generate Game"</b> to load your cards.</li>
+            <li><strong>Deal Cards:</strong> Click <b>"Deal Cards"</b> to lay the cards out. They start face-up so you can memorize them.</li>
+            <li><strong>Start Game:</strong> Click <b>"Start Game"</b> to flip them face-down. Find all matching pairs to win!</li>
+        </ol>
+    </div>
+
     <div class="input-container" id="input-container">
         <div class="upload-btn-wrapper">
             <button class="upload-btn">Upload Excel File</button>
@@ -176,13 +230,19 @@
         <button id="generate-game">Generate Game</button>
         <div id="error-message">No valid word pairs found. Please check your Excel file.</div>
     </div>
+    
     <div class="button-container">
         <button id="deal-button">Deal Cards</button>
         <button id="start-button">Start Game</button>
     </div>
+
+    <div class="stats-container">
+        <div id="timer" class="stat-box">⏱️ Time: 0s</div>
+        <div id="score" class="stat-box">🎯 Matches: 0 / 0</div>
+    </div>
+
     <div class="container" id="card-container"></div>
     <div id="success-message">🎆 Congratulations! You Win! 🎆</div>
-    <div id="timer">Time: 0 seconds</div>
 
     <script>
         let wordPairs = [];
@@ -203,6 +263,12 @@
                 document.querySelector('.upload-btn').textContent = fileName.length > 20 ? 
                     fileName.substring(0, 17) + '...' : fileName;
             });
+        }
+
+        function updateScoreDisplay() {
+            const totalPairs = wordPairs.length;
+            const currentMatches = matchedCards / 2;
+            document.getElementById('score').textContent = `🎯 Matches: ${currentMatches} / ${totalPairs}`;
         }
 
         function handleExcelUpload() {
@@ -243,6 +309,7 @@
 
                     hideError();
                     initCards();
+                    updateScoreDisplay(); // Initialize score when file is uploaded
                 } catch (error) {
                     showError("Error reading Excel file. Please try again.");
                     console.error(error);
@@ -337,6 +404,7 @@
                 matchedCards += 2;
                 flippedCards = [];
                 isFlipping = false;
+                updateScoreDisplay(); // Update score on successful match
                 checkWin();
             } else {
                 setTimeout(() => {
@@ -364,9 +432,10 @@
             initCards();
             document.getElementById('success-message').style.display = 'none';
             matchedCards = 0;
+            updateScoreDisplay(); // Reset score display
             clearInterval(timerInterval);
             timer = 0;
-            document.getElementById('timer').textContent = 'Time: 0 seconds';
+            document.getElementById('timer').textContent = '⏱️ Time: 0s';
         }
 
         function startGame() {
@@ -385,7 +454,7 @@
             timer = 0;
             timerInterval = setInterval(() => {
                 timer++;
-                document.getElementById('timer').textContent = `Time: ${timer} seconds`;
+                document.getElementById('timer').textContent = `⏱️ Time: ${timer}s`;
             }, 1000);
         }
     </script>
